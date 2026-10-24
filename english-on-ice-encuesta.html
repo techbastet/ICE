@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>English on Ice – Encuesta / Survey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#0b2a4a; --glacier:#1b6ca8; --sky:#5bb8ee; --frost:#d9f0fc; --ice:#f0faff;
+  --aurora:#2fc9c0; --berry:#e0507a; --glass:rgba(255,255,255,.62); --line:rgba(91,184,238,.45);
+  --font:'Outfit',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:light}
+body{font-family:var(--font);color:var(--deep);min-height:100vh;line-height:1.45;
+  background:linear-gradient(180deg,#bfe6fb 0%,#e6f6ff 45%,#fff 100%) fixed;overflow-x:hidden}
+#snow,#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#snow{z-index:0} #confetti{z-index:50}
+main{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:20px 16px 48px}
+header{text-align:center;padding:18px 0 14px}
+h1{font-size:clamp(2.2rem,9vw,3.4rem);font-weight:800;letter-spacing:-.02em;color:var(--deep);
+  text-shadow:0 2px 0 #fff,0 0 22px rgba(91,184,238,.6)}
+h1 span{color:var(--glacier)}
+.tag{font-size:.95rem;color:var(--glacier);margin-top:4px}
+.card{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1.5px solid rgba(255,255,255,.9);outline:1px solid var(--line);border-radius:28px 28px 28px 10px;
+  box-shadow:0 12px 40px rgba(27,108,168,.18),inset 0 1px 0 #fff;padding:22px 18px}
+@media(min-width:560px){.card{padding:30px 32px}}
+.progress{height:10px;border-radius:99px;background:var(--frost);overflow:hidden;margin:0 0 6px}
+.progress i{display:block;height:100%;width:33%;border-radius:99px;background:linear-gradient(90deg,var(--sky),var(--aurora));transition:width .5s}
+.stepname{font-size:.85rem;color:var(--glacier);margin-bottom:18px;font-weight:600}
+.step{display:none}.step.active{display:block}
+.q{margin-bottom:22px}
+.q>label,.q>legend{display:block;font-weight:700;font-size:1.05rem;padding:0;margin-bottom:8px}
+.es{display:block;font-weight:400;font-size:.9rem;color:#456b8c}
+.roles{display:grid;gap:10px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer}
+.opt span{display:block;padding:12px 16px;border-radius:16px 16px 16px 6px;background:#fff;border:1.5px solid var(--line);font-weight:600;transition:.2s}
+.opt span small{display:block;font-weight:400;color:#456b8c;font-size:.85rem}
+.opt input:checked+span{background:linear-gradient(135deg,var(--glacier),var(--sky));color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(27,108,168,.35)}
+.opt input:checked+span small{color:#e5f5ff}
+.opt input:focus-visible+span,.stars button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--aurora);outline-offset:2px}
+input[type=text],input[type=email],select,textarea{width:100%;font:inherit;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--deep)}
+textarea{min-height:130px;resize:vertical}
+select:disabled{opacity:.45;background:var(--frost)}
+.check{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:.92rem;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--glacier)}
+.stars{display:flex;gap:4px}
+.stars button{background:none;border:0;cursor:pointer;font-size:clamp(2.1rem,10vw,2.8rem);line-height:1;color:#b9d6e8;padding:2px;transition:transform .15s,color .15s}
+.stars button.on{color:#f6b73c;text-shadow:0 0 14px rgba(246,183,60,.6)}
+.stars button:active{transform:scale(1.25)}
+.err{display:none;color:var(--berry);font-weight:600;font-size:.88rem;margin-top:6px}
+.q.bad .err{display:block}
+.q.bad input[type=text],.q.bad select,.q.bad textarea{border-color:var(--berry)}
+.nav{display:flex;gap:12px;justify-content:space-between;margin-top:8px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:16px 16px 16px 6px;padding:14px 24px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+.btn.main{background:linear-gradient(135deg,var(--glacier),var(--sky));color:#fff;box-shadow:0 8px 20px rgba(27,108,168,.35);flex:1}
+.btn.ghost{background:#fff;color:var(--glacier);border:1.5px solid var(--line)}
+.btn:hover{transform:translateY(-2px)} .btn:disabled{opacity:.6;cursor:wait;transform:none}
+.hide{display:none!important}
+#loader{position:fixed;inset:0;z-index:60;background:rgba(11,42,74,.55);display:none;place-items:center;text-align:center;color:#fff;font-weight:600}
+#loader.on{display:grid}
+.spin{width:56px;height:56px;border-radius:50%;border:6px solid rgba(255,255,255,.3);border-top-color:#fff;margin:0 auto 14px;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+#prizeView{text-align:center}
+#prizeView h2{font-size:clamp(1.6rem,7vw,2.2rem);font-weight:800}
+#prizeView p{margin:6px 0 18px}
+.wheelwrap{position:relative;width:min(84vw,340px);margin:0 auto 18px}
+#wheel{width:100%;display:block;border-radius:50%;box-shadow:0 10px 34px rgba(27,108,168,.4);transition:transform 5s cubic-bezier(.12,.7,.1,1)}
+.pointer{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:32px solid var(--berry);filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));z-index:2}
+.hub{position:absolute;left:50%;top:50%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:#fff;border:4px solid var(--glacier);display:grid;place-items:center;font-size:1.5rem;z-index:1}
+#result{display:none;margin-top:6px;padding:18px;border-radius:20px;background:#fff;border:2px solid var(--aurora)}
+#result.on{display:block;animation:pop .5s}
+#result b{display:block;font-size:1.3rem}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="snow"></canvas><canvas id="confetti"></canvas>
+<div id="loader"><div><div class="spin"></div>Enviando… / Sending…</div></div>
+
+<main>
+<header>
+  <h1>English on <span>Ice</span> ❄️</h1>
+  <p class="tag">Cuéntanos tu experiencia · Tell us about your experience</p>
+</header>
+
+<section class="card" id="surveyCard">
+  <div class="progress"><i id="bar"></i></div>
+  <p class="stepname" id="stepName"></p>
+
+  <form id="form" novalidate>
+    <!-- PASO 1 -->
+    <div class="step active" data-title="Paso 1 de 3 · Step 1 of 3 — Tus datos / About you">
+      <fieldset class="q" id="q-role" style="border:0;padding:0">
+        <legend>What is your role in the event?<span class="es">¿Cuál es tu rol en el evento?</span></legend>
+        <div class="roles">
+          <label class="opt"><input type="radio" name="role" value="Student"><span>Student<small>Estudiante</small></span></label>
+          <label class="opt"><input type="radio" name="role" value="Parent"><span>Parent<small>Padre o Acudiente</small></span></label>
+          <label class="opt"><input type="radio" name="role" value="Teacher or Administrator"><span>Teacher or Administrator<small>Docente o Directivo</small></span></label>
+          <label class="opt"><input type="radio" name="role" value="Guest or Visitor"><span>Guest or Visitor<small>Visitante o Invitado</small></span></label>
+        </div>
+        <p class="err">Elige una opción / Choose an option</p>
+      </fieldset>
+
+      <div class="q" id="q-grade">
+        <label for="grade">If you are a student, what grade are you in?<span class="es">Si eres estudiante, ¿de qué grado eres?</span></label>
+        <select id="grade" name="grade">
+          <option value="">Selecciona / Select…</option>
+          <option>Preescolar</option><option>1°</option><option>2°</option><option>3°</option><option>4°</option><option>5°</option>
+          <option>6°</option><option>7°</option><option>8°</option><option>9°</option><option>10°</option><option>11°</option>
+        </select>
+        <label class="check"><input type="checkbox" id="gradeNA"> N/A (Not a student / No soy estudiante)</label>
+        <p class="err">Elige tu grado o marca N/A / Pick your grade or tick N/A</p>
+      </div>
+
+      <div class="q" id="q-name">
+        <label for="fullname">Full name<span class="es">Nombre completo</span></label>
+        <input type="text" id="fullname" name="fullname" autocomplete="name">
+        <p class="err">Escribe tu nombre completo / Enter your full name</p>
+      </div>
+
+      <div class="q" id="q-contact">
+        <label for="contact">WhatsApp number or email (needed for the prize draw)<span class="es">Número de WhatsApp o correo (necesario para el sorteo)</span></label>
+        <input type="text" id="contact" name="contact" autocomplete="email" inputmode="email" placeholder="+57 300 000 0000 / nombre@correo.com">
+        <p class="err">Escribe un WhatsApp o correo válido / Enter a valid WhatsApp or email</p>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step" data-title="Paso 2 de 3 · Step 2 of 3 — Valoración / Ratings">
+      <div class="q" data-rate="exhibitions">
+        <label>How attractive and creative did you find the exhibitions (Arctic, Antarctica, polar animals, models)?<span class="es">¿Qué tan atractivas y creativas te parecieron las exhibiciones?</span></label>
+        <div class="stars" role="radiogroup"></div><p class="err">Califica de 1 a 5 / Rate 1 to 5</p>
+      </div>
+      <div class="q" data-rate="english">
+        <label>Do you feel the event helped improve your English level or your interest in the language?<span class="es">¿Sientes que el evento ayudó a mejorar tu nivel de inglés o el interés por el idioma?</span></label>
+        <div class="stars" role="radiogroup"></div><p class="err">Califica de 1 a 5 / Rate 1 to 5</p>
+      </div>
+      <div class="q" data-rate="climate">
+        <label>How much did you learn about planet conservation and Climate Change?<span class="es">¿Qué tanto aprendiste sobre la conservación del planeta y el Cambio Climático?</span></label>
+        <div class="stars" role="radiogroup"></div><p class="err">Califica de 1 a 5 / Rate 1 to 5</p>
+      </div>
+      <div class="q" data-rate="overall">
+        <label>Overall, how do you rate this “English on Ice” event?<span class="es">En general, ¿cómo evalúas la experiencia de este evento “English on Ice”?</span></label>
+        <div class="stars" role="radiogroup"></div><p class="err">Califica de 1 a 5 / Rate 1 to 5</p>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step" data-title="Paso 3 de 3 · Step 3 of 3 — Comentarios / Comments">
+      <div class="q" id="q-comments">
+        <label for="comments">What did you like the most, or what suggestions do you have for the next edition?<span class="es">¿Qué fue lo que más te gustó o qué sugerencia tienes para la próxima edición?</span></label>
+        <textarea id="comments" name="comments"></textarea>
+        <p class="err" id="sendErr">No se pudo enviar. Revisa tu conexión e inténtalo de nuevo. / Could not send. Check your connection and try again.</p>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button type="button" class="btn ghost hide" id="prev">← Atrás / Back</button>
+      <button type="button" class="btn main" id="next">Siguiente / Next</button>
+    </div>
+  </form>
+</section>
+
+<section class="card hide" id="prizeView">
+  <h2>🎉 ¡Gracias! / Thank you!</h2>
+  <p>Gira la ruleta polar y descubre tu premio.<br>Spin the Polar Wheel and find your prize.</p>
+  <div class="wheelwrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="680" height="680"></canvas>
+    <div class="hub">❄️</div>
+  </div>
+  <button class="btn main" id="spinBtn" style="width:100%;max-width:340px">Girar / Spin ❄️</button>
+  <div id="result" role="status" aria-live="polite"><b id="resES"></b><span id="resEN"></span></div>
+</section>
+</main>
+
+<script>
+/* ============ CONFIGURACIÓN ============ */
+const WEBHOOK_URL = "https://tu-webhook-url.com";   // ← pega aquí tu URL de Make / Zapier / Apps Script
+
+// Los 3 regalos de la ruleta. "weight" = probabilidad relativa.
+const PRIZES = [
+  {emoji:"🎟️", short:"Sticker",    es:"¡Ganaste un sticker polar!",                    en:"You won a polar sticker!",                 weight:4, color:"#1b6ca8"},
+  {emoji:"📚", short:"+1 punto",   es:"¡Ganaste un punto extra en inglés!",            en:"You won an extra point in English!",       weight:2, color:"#2fc9c0"},
+  {emoji:"🏆", short:"Gran premio",es:"¡Participante registrado para el gran premio!", en:"You’re entered in the grand prize draw!",  weight:4, color:"#5bb8ee"}
+];
+
+/* ============ UTILIDADES ============ */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ============ NIEVE ============ */
+(function snow(){
+  const c = $("#snow"), x = c.getContext("2d"); let W,H,flakes=[];
+  const size = () => { W = c.width = innerWidth; H = c.height = innerHeight; };
+  size(); addEventListener("resize", size);
+  flakes = Array.from({length: reduceMotion ? 0 : 70}, () => ({x:Math.random()*W, y:Math.random()*H, r:1+Math.random()*3, s:.3+Math.random()*1, d:Math.random()*6}));
+  (function loop(){
+    x.clearRect(0,0,W,H); x.fillStyle="rgba(255,255,255,.9)";
+    flakes.forEach(f => { f.y+=f.s; f.d+=.01; f.x+=Math.sin(f.d)*.5; if(f.y>H){f.y=-5;f.x=Math.random()*W}
+      x.beginPath(); x.arc(f.x,f.y,f.r,0,7); x.fill(); });
+    requestAnimationFrame(loop);
+  })();
+})();
+
+/* ============ ESTRELLAS ============ */
+const ratings = {};
+$$(".stars").forEach(box => {
+  const key = box.closest("[data-rate]").dataset.rate;
+  for(let i=1;i<=5;i++){
+    const b = document.createElement("button");
+    b.type="button"; b.textContent="★"; b.setAttribute("role","radio");
+    b.setAttribute("aria-label", i+" / 5"); b.dataset.v=i;
+    b.onclick = () => { ratings[key]=i; paint(box,i); box.closest(".q").classList.remove("bad"); };
+    b.onmouseenter = () => paint(box,i);
+    box.appendChild(b);
+  }
+  box.onmouseleave = () => paint(box, ratings[key]||0);
+});
+function paint(box,n){ $$("button",box).forEach(b => b.classList.toggle("on", +b.dataset.v<=n)); }
+
+/* ============ N/A de grado ============ */
+$("#gradeNA").onchange = e => { $("#grade").disabled = e.target.checked; if(e.target.checked) $("#grade").value=""; };
+
+/* ============ PASOS ============ */
+let step = 0;
+const steps = $$(".step");
+function show(n){
+  step = n;
+  steps.forEach((s,i) => s.classList.toggle("active", i===n));
+  $("#bar").style.width = ((n+1)/steps.length*100)+"%";
+  $("#stepName").textContent = steps[n].dataset.title;
+  $("#prev").classList.toggle("hide", n===0);
+  $("#next").textContent = n===steps.length-1 ? "Enviar / Submit ❄️" : "Siguiente / Next →";
+  scrollTo({top:0, behavior: reduceMotion?"auto":"smooth"});
+}
+function flag(sel, bad){ $(sel).classList.toggle("bad", bad); return !bad; }
+
+function validate(n){
+  let ok = true;
+  if(n===0){
+    const role = $('input[name=role]:checked');
+    ok = flag("#q-role", !role) && ok;
+    const isStudent = role && role.value==="Student";
+    const naOK = $("#gradeNA").checked || $("#grade").value;
+    ok = flag("#q-grade", isStudent && !naOK) && ok;
+    ok = flag("#q-name", $("#fullname").value.trim().split(/\s+/).filter(Boolean).length < 2 && true) && ok;
+    const c = $("#contact").value.trim();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c) || c.replace(/\D/g,"").length >= 7;
+    ok = flag("#q-contact", !valid) && ok;
+  }
+  if(n===1){
+    $$("[data-rate]").forEach(q => { ok = flag("[data-rate="+q.dataset.rate+"]", !ratings[q.dataset.rate]) && ok; });
+  }
+  return ok;
+}
+
+$("#prev").onclick = () => show(step-1);
+$("#next").onclick = () => {
+  if(!validate(step)){ const bad=$(".q.bad"); bad && bad.scrollIntoView({block:"center", behavior:"smooth"}); return; }
+  if(step < steps.length-1) show(step+1); else submitSurvey();
+};
+
+/* ============ ENVÍO AL WEBHOOK ============ */
+function collect(){
+  return {
+    type: "survey",
+    timestamp: new Date().toISOString(),
+    event: "English on Ice",
+    role: $('input[name=role]:checked').value,
+    grade: $("#gradeNA").checked ? "N/A" : $("#grade").value,
+    fullName: $("#fullname").value.trim(),
+    contact: $("#contact").value.trim(),
+    ratings: {...ratings},
+    comments: $("#comments").value.trim()
+  };
+}
+
+async function sendToWebhook(payload){
+  // Modo demostración: si no se ha configurado la URL, simula el envío.
+  if(WEBHOOK_URL.includes("tu-webhook-url")){
+    console.warn("WEBHOOK_URL sin configurar: modo demo.", payload);
+    await new Promise(r => setTimeout(r, 1200));
+    return true;
+  }
+  // text/plain evita el preflight CORS (funciona con Apps Script, Make y Zapier)
+  const res = await fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: {"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  return true;
+}
+
+let surveyData = null;
+async function submitSurvey(){
+  surveyData = collect();
+  $("#sendErr").style.display = "none";
+  $("#loader").classList.add("on"); $("#next").disabled = true;
+  try{
+    await sendToWebhook(surveyData);
+    $("#surveyCard").classList.add("hide");
+    $("#prizeView").classList.remove("hide");
+    scrollTo({top:0});
+    drawWheel(); confetti();
+  }catch(err){
+    console.error(err);
+    $("#sendErr").style.display = "block";
+  }finally{
+    $("#loader").classList.remove("on"); $("#next").disabled = false;
+  }
+}
+
+/* ============ RULETA ============ */
+const wheel = $("#wheel"), wctx = wheel.getContext("2d");
+const ARC = 2*Math.PI / PRIZES.length;
+let rot = 0, spinning = false, played = false;
+
+function drawWheel(){
+  const S = wheel.width, R = S/2;
+  wctx.clearRect(0,0,S,S);
+  PRIZES.forEach((p,i) => {
+    wctx.beginPath(); wctx.moveTo(R,R); wctx.arc(R,R,R-6,i*ARC,(i+1)*ARC); wctx.closePath();
+    wctx.fillStyle = p.color; wctx.fill();
+    wctx.strokeStyle = "#fff"; wctx.lineWidth = 5; wctx.stroke();
+    wctx.save(); wctx.translate(R,R); wctx.rotate(i*ARC + ARC/2);
+    wctx.textAlign = "right"; wctx.fillStyle = "#fff";
+    wctx.font = "700 34px Outfit, system-ui, sans-serif";
+    wctx.fillText(p.short, R-40, 12);
+    wctx.font = "44px system-ui, sans-serif";
+    wctx.fillText(p.emoji, R-230, 15);
+    wctx.restore();
+  });
+  wctx.beginPath(); wctx.arc(R,R,R-3,0,7); wctx.strokeStyle="#fff"; wctx.lineWidth=8; wctx.stroke();
+}
+
+function pickWinner(){
+  const total = PRIZES.reduce((a,p)=>a+p.weight,0); let r = Math.random()*total;
+  for(let i=0;i<PRIZES.length;i++){ r -= PRIZES[i].weight; if(r<=0) return i; }
+  return 0;
+}
+
+$("#spinBtn").onclick = () => {
+  if(spinning || played) return;
+  spinning = true; $("#spinBtn").disabled = true;
+  const win = pickWinner();
+  const centerDeg = (win + .5) * ARC * 180/Math.PI + (Math.random()-.5) * ARC * 180/Math.PI * .7;
+  // El puntero está arriba (270° en el canvas): centro + rotación ≡ 270
+  const target = ((270 - centerDeg) % 360 + 360) % 360;
+  const delta = ((target - rot % 360) + 360) % 360;
+  rot += 5*360 + delta;
+  wheel.style.transform = "rotate("+rot+"deg)";
+  setTimeout(() => finishSpin(win), reduceMotion ? 50 : 5100);
+};
+
+function finishSpin(i){
+  const p = PRIZES[i];
+  spinning = false; played = true;
+  $("#resES").textContent = p.emoji+" "+p.es;
+  $("#resEN").textContent = p.en;
+  $("#result").classList.add("on");
+  $("#spinBtn").textContent = "¡Listo! / Done ✔";
+  if(p.short!=="Otra vez") confetti();
+  // Registra el premio (opcional, no bloquea la experiencia)
+  sendToWebhook({type:"prize", timestamp:new Date().toISOString(), fullName:surveyData.fullName, contact:surveyData.contact, prize:p.en})
+    .catch(e => console.warn("No se pudo registrar el premio", e));
+}
+
+/* ============ CONFETI ============ */
+function confetti(){
+  if(reduceMotion) return;
+  const c = $("#confetti"), x = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#ffffff","#5bb8ee","#2fc9c0","#1b6ca8","#d9f0fc","#f6b73c"];
+  const ps = Array.from({length:140}, () => ({x:innerWidth/2, y:innerHeight*.35, vx:(Math.random()-.5)*16, vy:-Math.random()*14-3,
+    w:5+Math.random()*7, h:8+Math.random()*8, a:Math.random()*6, va:(Math.random()-.5)*.4, col:cols[Math.random()*cols.length|0]}));
+  let t = 0;
+  (function f(){
+    x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p => { p.vy+=.28; p.x+=p.vx; p.y+=p.vy; p.a+=p.va;
+      x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.fillStyle=p.col; x.fillRect(-p.w/2,-p.h/2,p.w,p.h); x.restore(); });
+    if(++t < 220) requestAnimationFrame(f); else x.clearRect(0,0,c.width,c.height);
+  })();
+}
+
+show(0);
+</script>
+</body>
+</html>
